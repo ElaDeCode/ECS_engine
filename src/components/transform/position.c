@@ -5,86 +5,81 @@
 
 #include "position.h"
 
-PositionAssignerList createPositionAssignerList(unsigned int count)
+PositionerList initPositioner(unsigned int size)
 {
-    PositionAssignerList e = {
-        .size = count,
+    // initialize the PositionAssignerList
+    // allocate memory for the PositionAssignerList
+    PositionerList e = {
+        .size = size,
         .count = 0,
-        .list = (PositionAssignerComponent *)malloc(count * sizeof(PositionAssignerComponent))
+        .list = (Positioner *)malloc(size * sizeof(Positioner))
     };
+
+    // quit if the memory allocation failed
     assert(e.list != NULL);
     
     return e;
 }
 
-void freePositionAssignerList(PositionAssignerList e)
+void closePositioner(PositionerList e)
 {
+    // free the memory allocated for the PositionAssignerList
     free(e.list);
 }
 
-Positioner *addPositioner(PositionAssignerList *e)
+Positioner *addPositioner(PositionerList *e)
 {
     // if the list is full, double the size like a vector
     if (e->count >= e->size)
     {
         e->size = e->size * 2 + 1;
-        e->list = (PositionAssignerComponent *)realloc(e->list, e->size * sizeof(PositionAssignerComponent));
+        e->list = (Positioner *)realloc(e->list, e->size * sizeof(Positioner));
         assert(e->list != NULL);
     }
     
     // initialize the new PositionAssignerComponent
-    memset(&e->list[e->count], 0, sizeof(PositionAssignerComponent));
+    memset(&e->list[e->count], 0, sizeof(Positioner));
 
     // return the new PositionAssignerComponent
     return &e->list[e->count++];
 }
 
-void updatePositions(PositionAssignerList e)
+void updatePositioners(PositionerList e)
 {
-    PositionAssignerComponent *const l = e.list;
+    Positioner *const l = e.list;
     for (int i = 0; i < e.count; i++)
     {
-        if (l[i].willMove)
+        if (l[i].willUpdate)
         {
             l[i].current = l[i].target;
         }
     }
 }
 
-void moveToNext(Positioner *p, float x, float y)
+void moveToPosition(Positioner *p, float x, float y)
 {
     p->target.x = x;
     p->target.y = y;
-    p->willMove = 1;
+    p->willUpdate = 1;
 }
 
-void moveToInstant(Positioner *p, float x, float y)
+void setPosition(Positioner *p, float x, float y)
 {
     p->current.x = x;
     p->current.y = y;
-    p->willMove = 0;
+    p->willUpdate = 0;
 }
 
-void moveByNext(Positioner *p, float x, float y)
+void moveBy(Positioner *p, float x, float y)
 {
     p->target.x = p->current.x + x;
     p->target.y = p->current.y + y;
-    p->willMove = 1;
+    p->willUpdate = 1;
 }
 
 void moveByInstant(Positioner *p, float x, float y)
 {
     p->current.x += x;
     p->current.y += y;
-    p->willMove = 0;
-}
-
-Position getPosition(Positioner p)
-{
-    return p.current;
-}
-
-Position getTargetPosition(Positioner p)
-{
-    return p.target;
+    p->willUpdate = 0;
 }

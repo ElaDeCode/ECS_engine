@@ -1,39 +1,34 @@
 #ifndef POSITION_H
 #define POSITION_H
 
+#include "../../primitives/vector.h"
+
 // position
-typedef struct Position
-{
-    float x;
-    float y;
-} Position;
+typedef Vector2 Position;
 
 // current position and target position for movement
-typedef struct PositionAssignerComponent
+typedef struct Positioner
 {
     Position current;
     Position target;
-    char willMove;
-} PositionAssignerComponent;
+    char willUpdate;
+} Positioner;
 
 // list of position assigners for system to use
-typedef struct PositionAssignerList
+typedef struct PositionerList
 {
     unsigned int size;
     unsigned int count;
-    PositionAssignerComponent *list;
-} PositionAssignerList;
+    Positioner *list;
+} PositionerList;
 
-// short wrapper for PositionAssignerComponent
-typedef PositionAssignerComponent Positioner;
-
-PositionAssignerList createPositionAssignerList(unsigned int count);
-void freePositionAssignerList(PositionAssignerList e);
-Positioner *addPositioner(PositionAssignerList *e);
-void updatePositions(PositionAssignerList e);
-void moveToNext(Positioner *p, float x, float y);
-void moveToInstant(Positioner *p, float x, float y);
-void moveByNext(Positioner *p, float x, float y);
+PositionerList initPositioner(unsigned int size);
+void closePositioner(PositionerList e);
+Positioner *addPositioner(PositionerList *e);
+void updatePositioners(PositionerList e);
+void moveToPosition(Positioner *p, float x, float y);
+void setPosition(Positioner *p, float x, float y);
+void moveBy(Positioner *p, float x, float y);
 void moveByInstant(Positioner *p, float x, float y);
 Position getPosition(Positioner p);
 Position getTargetPosition(Positioner p);

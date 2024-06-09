@@ -4,59 +4,62 @@
 
 #include "components/transform/position.h"
 #include "components/transform/rotation.h"
-#include "components/physics/physics.h"
 
 static const int screenWidth = 1000;
 static const int screenHeight = 800;
 static const char *screenTitle = "Hello, World!";
 
-static PositionAssignerList positions = {
-    .size = 0,
-    .count = 0,
-    .list = NULL,
-};
-
 int main()
 {
     InitWindow(screenWidth, screenHeight, screenTitle);
 
-    struct {
+    PositionerList positions = initPositioner(1);
+    RotatorList rotations = initRotator(1);
+
+    struct
+    {
         Rectangle rect;
-        Positioner *position;
-        Rotator *rotation;
+        Vector2 origin;
+        Positioner *positioner;
+        Rotator *rotator;
     } player;
 
     player.rect = (Rectangle){400, 400, 50, 50};
-    player.position = addPositioner(&positions);
+    player.origin = (Vector2){player.rect.width / 2, player.rect.height / 2};
+    player.positioner = addPositioner(&positions);
+    player.rotator = addRotator(&rotations);
 
-    player.position->current.x = player.rect.x;
-    player.position->current.y = player.rect.y;
+    player.positioner->current.x = player.rect.x;
+    player.positioner->current.y = player.rect.y;
+    player.rotator->current = 0;
 
     // set player position to move to
-    moveToInstant(player.position, 500, 500);
-    // draw player
-    BeginDrawing();
-    DrawRectangle(player.position->current.x, player.position->current.y, player.rect.width, player.rect.height, RED);
-    EndDrawing();
-    WaitTime(1);
-
+    setPosition(player.positioner, 500, 500);
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-        moveByNext(player.position, 1, 1);
+        // moveBy(player.positioner, 1, 1);
+        rotateBy(player.rotator, (Rotation)1);
+        player.rect.x = player.positioner->current.x;
+        player.rect.y = player.positioner->current.y;
 
         // update player position
-        updatePositions(positions);
-        DrawRectangle(player.position->current.x, player.position->current.y, player.rect.width, player.rect.height, RED);
+        updatePositioners(positions);
+        updateRotators(rotations);
 
-        DrawText("Hello, World!", 10, 10, 20, DARKGRAY);
+        BeginDrawing();
+
+        ClearBackground(BLACK);
+
+        DrawRectanglePro(player.rect, player.origin, player.rotator->current, RED);
+
+        DrawText("Hello, World!", 10, 10, 20, GREEN);
 
         EndDrawing();
     }
+
+    CloseWindow();
 
     return 0;
 }

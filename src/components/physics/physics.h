@@ -14,7 +14,7 @@ typedef struct CollisionRectList
     int count;
 } CollisionRectList;
 
-void checkCollisionRects(PositionAssignerList *p, RotationAssignerList *r, CollisionRectList *c)
+void checkCollisionRects(PositionerList *p, RotatorList *r, CollisionRectList *c)
 {
     for (int i = 0; i < p->count; i++)
     {
@@ -25,7 +25,7 @@ void checkCollisionRects(PositionAssignerList *p, RotationAssignerList *r, Colli
             CollisionRect *const o2 = &c->objects[j];
             if (CheckCollisionRecs(o1->collision, o2->collision))
             {
-                p->list[i].willMove = 0;
+                p->list[i].willUpdate = 0;
             }
         }
     }
@@ -33,14 +33,14 @@ void checkCollisionRects(PositionAssignerList *p, RotationAssignerList *r, Colli
 
 void updatePhysics(Positioner *p, Rotator *r)
 {
-    if (p->willMove)
+    if (p->willUpdate)
     {
         p->current.x += (p->target.x - p->current.x) * 0.1f;
         p->current.y += (p->target.y - p->current.y) * 0.1f;
     }
 
-    if (r->willRotate)
+    if (r->willUpdate)
     {
-        r->rotation += (r->delta) * 0.1f;
+        r->current += (r->delta) * 0.1f;
     }
 }

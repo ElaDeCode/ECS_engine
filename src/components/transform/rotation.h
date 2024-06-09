@@ -1,40 +1,31 @@
 #ifndef ROTATION_H
 #define ROTATION_H
 
-#include "position.h"
+#include "../../primitives/vector.h"
 
-// Rotation
 typedef float Rotation;
 
-// current Rotation and target Rotation for movement
-typedef struct
+typedef struct Rotator
 {
-    Rotation rotation;
+    Rotation current;
     Rotation delta;
-    Position pivot;
-    char willRotate;
-} RotationAssignerComponent;
+    char willUpdate;
+} Rotator;
 
-// list of Rotation assigners for system to use
-typedef struct
+typedef struct RotatorList
 {
+    unsigned int size;
     unsigned int count;
-    RotationAssignerComponent *list;
-} RotationAssignerList;
+    Rotator *list;
+} RotatorList;
 
-// short wrapper for RotationAssignerComponent
-typedef RotationAssignerComponent Rotator;
+RotatorList initRotator(unsigned int size);
+void closeRotator(RotatorList e);
+Rotator *addRotator(RotatorList *e);
+void updateRotators(RotatorList e);
+void setRotation(Rotator *r, Rotation rot);
+void rotateBy(Rotator *r, Rotation rot);
+void rotateByInstant(Rotator *r, Rotation rot);
 
-static inline void updateRotations(RotationAssignerList e)
-{
-    RotationAssignerComponent *const l = e.list;
-    for (int i = 0; i < e.count; i++)
-    {
-        if (l[i].willRotate)
-        {
-            l[i].rotation += l[i].delta;
-        }
-    }
-}
 
 #endif // ROTATION_H
